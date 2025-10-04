@@ -1,0 +1,98 @@
+digraph MCP_Server {
+    rankdir=TB;
+    node [shape=box, style=rounded];
+    
+    // Main components
+    subgraph cluster_main {
+        label="MCP Server (main.go)";
+        style=filled;
+        color=lightblue;
+        
+        main [label="main()\nEntry Point"];
+        loadEnv [label="loadEnv()\nLoad .env file"];
+        server [label="MCP Server\n(stdio transport)"];
+        serve [label="server.Serve()\nListen for requests"];
+    }
+    
+    // Tools registered
+    subgraph cluster_tools {
+        label="Registered Tools";
+        style=filled;
+        color=lightgreen;
+        
+        zipcode_tool [label="zipcode tool\nFind address by zip"];
+        claude_tool [label="ask_claude tool\nAsk Claude AI"];
+    }
+    
+    // External APIs
+    subgraph cluster_external {
+        label="External APIs";
+        style=filled;
+        color=lightyellow;
+        
+        viacep [label="ViaCEP API\nviacep.com.br\n(Brazilian postal codes)"];
+        claude_api [label="Claude API\napi.anthropic.com\n(Anthropic AI)"];
+    }
+    
+    // Cache system
+    subgraph cluster_cache {
+        label="Caching System";
+        style=filled;
+        color=lightpink;
+        
+        cache_check [label="getFromCache()\nCheck file cache"];
+        cache_save [label="saveOnCache()\nSave to temp files"];
+        temp_files [label="Temp Files\n/tmp/cep*"];
+    }
+    
+    // Functions
+    getCep [label="getCep()\nFetch zip code data"];
+    askClaude [label="askClaude()\nQuery Claude AI"];
+    
+    // Test Client
+    subgraph cluster_client {
+        label="Test Client (cmd/test-client/)";
+        style=filled;
+        color=lightcoral;
+        
+        test_client [label="Test Client\nmain.go"];
+        commands [label="Commands:\n• list\n• zipcode <code>\n• claude <question>"];
+    }
+    
+    // Flow connections
+    main -> loadEnv;
+    main -> server;
+    server -> zipcode_tool;
+    server -> claude_tool;
+    server -> serve;
+    
+    zipcode_tool -> getCep;
+    claude_tool -> askClaude;
+    
+    getCep -> cache_check;
+    cache_check -> viacep [label="cache miss"];
+    cache_check -> getCep [label="cache hit", style=dashed];
+    viacep -> cache_save;
+    cache_save -> temp_files;
+    
+    askClaude -> claude_api;
+    
+    // Test client connections
+    test_client -> commands;
+    test_client -> server [label="JSON-RPC\nover stdio", style=dashed];
+    
+    // JSON-RPC protocol
+    jsonrpc [label="JSON-RPC Protocol\n• tools/list\n• tools/call", shape=ellipse, style=filled, color=orange];
+    test_client -> jsonrpc [style=dashed];
+    jsonrpc -> server [style=dashed];
+    
+    // Legend
+    subgraph cluster_legend {
+        label="Legend";
+        style=filled;
+        color=white;
+        
+        solid_edge [label="Direct function call", style=solid];
+        dashed_edge [label="Communication/Data flow", style=dashed];
+    }
+}

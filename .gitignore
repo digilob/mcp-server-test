@@ -1,0 +1,56 @@
+# Go builds and binaries
+*.exe
+main
+go-agent/main
+mcp-server-multi-ai.exe
+file-ops-server.exe
+test-client.exe
+__debug_bin.exe
+
+# Go module cache
+go.sum
+
+# Environment files (contains API keys)
+.env
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Cache files
+/tmp/
+cache/
+
+# Test outputs
+test-output/
+*.test
+
+# Coverage reports
+*.out
+coverage.html
+
+# Documentation builds
+docs/_build/
+
+# Local development
+local/
+scratch/
