@@ -1,5 +1,5 @@
 # Multi-AI MCP Server
-FROM golang:1.21-alpine AS builder
+FROM golang:1.23-alpine AS builder
 
 # Install ca-certificates for HTTPS requests
 RUN apk --no-cache add ca-certificates git
@@ -27,18 +27,8 @@ WORKDIR /root/
 # Copy the binary from builder
 COPY --from=builder /app/mcp-server .
 
-# Copy any additional files if needed
-COPY --from=builder /app/mcp-server-architecture.dot .
-
 # Expose port (optional, mainly for JSON-RPC over stdio)
 EXPOSE 8080
-
-# Environment variables (will be overridden by .env or docker-compose)
-ENV CLAUDE_API_KEY=""
-ENV OPENAI_API_KEY=""
-ENV GEMINI_API_KEY=""
-ENV MISTRAL_API_KEY=""
-ENV HUGGINGFACEHUB_API_TOKEN=""
 
 # Create a health check script
 RUN echo '#!/bin/sh\necho "MCP Server is running"' > /healthcheck.sh && chmod +x /healthcheck.sh

@@ -14,7 +14,7 @@ go.sum
 .env
 
 # Docker environment template (keep this)
-!.env.docker
+.env.docker
 
 # IDE and editor files
 .vscode/
