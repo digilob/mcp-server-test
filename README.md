@@ -1,6 +1,6 @@
 # 🚀 Multi-AI MCP Server with Go LangChain Agent
 
-A revolutionary **Model Context Protocol (MCP) server** that integrates **5 major AI providers** with intelligent **Go LangChain-style orchestration**. This project provides a complete AI ecosystem with file operations, multi-step workflows, and enterprise-grade performance.
+A  **Model Context Protocol (MCP) server** that integrates **5 major AI providers** with intelligent **Go LangChain-style orchestration**. This project provides a complete AI ecosystem with file operations, multi-step workflows, and enterprise-grade performance.
 
 ## ⭐ **Star Features**
 
