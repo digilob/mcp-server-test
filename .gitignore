@@ -13,6 +13,9 @@ go.sum
 # Environment files (contains API keys)
 .env
 
+# Docker environment template (keep this)
+!.env.docker
+
 # IDE and editor files
 .vscode/
 .idea/
@@ -54,3 +57,11 @@ docs/_build/
 # Local development
 local/
 scratch/
+
+# Docker volumes and data
+data/
+volumes/
+docker-data/
+
+# Node modules (for future web UI)
+node_modules/

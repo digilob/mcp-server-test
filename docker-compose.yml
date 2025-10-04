@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  # Main Multi-AI MCP Server
+  mcp-ai-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mcp-ai-server
+    restart: unless-stopped
+    environment:
+      - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - MISTRAL_API_KEY=${MISTRAL_API_KEY}
+      - HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    ports:
+      - "8080:8080"
+    networks:
+      - mcp-network
+    healthcheck:
+      test: ["CMD", "/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # File Operations MCP Server
+  mcp-file-server:
+    build:
+      context: ./mcp-file-ops
+      dockerfile: Dockerfile
+    container_name: mcp-file-server
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./data:/data
+      - ./temp:/tmp
+    networks:
+      - mcp-network
+    healthcheck:
+      test: ["CMD", "echo", "File server running"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Optional: Web interface (future enhancement)
+  # mcp-web-ui:
+  #   build:
+  #     context: ./web-ui
+  #     dockerfile: Dockerfile
+  #   container_name: mcp-web-ui
+  #   restart: unless-stopped
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - mcp-ai-server
+  #     - mcp-file-server
+  #   networks:
+  #     - mcp-network
+
+networks:
+  mcp-network:
+    driver: bridge
+
+volumes:
+  mcp-data:
+    driver: local

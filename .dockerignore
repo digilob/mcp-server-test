@@ -1,0 +1,50 @@
+# Git
+.git
+.gitignore
+
+# Environment files (security)
+.env
+*.env
+
+# Documentation
+*.md
+docs/
+
+# Temporary files
+*.tmp
+*.log
+temp/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build artifacts
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test files
+*_test.go
+test/
+
+# Go specific
+vendor/
+
+# Architecture diagrams (optional - you might want to include these)
+*.dot
+*.png
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Node modules (if you add web UI later)
+node_modules/
+
+# Local data directories
+data/
+logs/
