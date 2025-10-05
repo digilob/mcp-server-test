@@ -5,6 +5,7 @@
 # Environment files (security)
 .env
 *.env
+.docker.env
 
 # Documentation
 *.md

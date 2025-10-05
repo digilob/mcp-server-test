@@ -10,10 +10,9 @@ __debug_bin.exe
 # Go module cache
 go.sum
 
-# Environment files (contains API keys)
+# Security - Environment files with API keys
 .env
-
-# Docker environment template (keep this)
+*.env
 .env.docker
 
 # IDE and editor files

@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"ask_claude","arguments":{"question":"Hello! Please respond briefly to test the MCP system."}}}

@@ -143,11 +143,12 @@ type Cep struct {
 	Gia         string `json:"gia"`
 }
 
-// loadEnv loads environment variables from .env file
-func loadEnv() error {
+// loadEnv loads environment variables from .env file (fails silently if file doesn't exist)
+func loadEnv() {
 	file, err := os.Open(".env")
 	if err != nil {
-		return err
+		// Silently ignore if .env file doesn't exist (normal in Docker)
+		return
 	}
 	defer file.Close()
 
@@ -167,21 +168,15 @@ func loadEnv() error {
 			os.Setenv(key, value)
 		}
 	}
-	return scanner.Err()
 }
 
 func main() {
+	// Try to load .env file for local development
+	// This will fail silently in Docker, which is fine since
+	// environment variables are passed via docker-compose
+	loadEnv()
 
-	// Load environment variables from .env file
-	if err := loadEnv(); err != nil {
-		fmt.Printf("Warning: Could not load .env file: %v\n", err)
-	}
-
-	done := make(chan struct{})
-
-	server := mcp_golang.NewServer(stdio.NewStdioServerTransport())
-
-	// Register zipcode tool
+	server := mcp_golang.NewServer(stdio.NewStdioServerTransport()) // Register zipcode tool
 	err := server.RegisterTool("zipcode", "Find an address by his zip code", func(arguments MyFunctionsArguments) (*mcp_golang.ToolResponse, error) {
 		address, err := getCep(arguments.ZipCode)
 		if err != nil {
@@ -258,12 +253,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
 	err = server.Serve()
 	if err != nil {
 		panic(err)
 	}
-
-	<-done
 }
 
 func getCep(id string) (string, error) {
