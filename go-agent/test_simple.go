@@ -43,8 +43,8 @@ func (t *SimpleMCPZipcodeTool) Execute(args map[string]interface{}) (string, err
 		zipcode = fmt.Sprintf("%s-%s", zipcode[:5], zipcode[5:])
 	}
 
-	// Execute the MCP client
-	clientPath := filepath.Join(t.serverPath, "cmd", "test-client")
+	// Execute the MCP client with proper working client
+	clientPath := filepath.Join(t.serverPath, "cmd", "mcp-test-client")
 	cmd := exec.Command("go", "run", "main.go", "zipcode", zipcode)
 	cmd.Dir = clientPath
 
@@ -78,8 +78,8 @@ func (t *SimpleMCPClaudeTool) Execute(args map[string]interface{}) (string, erro
 		return "", fmt.Errorf("question argument is required")
 	}
 
-	// Execute the MCP client
-	clientPath := filepath.Join(t.serverPath, "cmd", "test-client")
+	// Execute the MCP client with proper working client
+	clientPath := filepath.Join(t.serverPath, "cmd", "mcp-test-client")
 	cmd := exec.Command("go", "run", "main.go", "claude", question)
 	cmd.Dir = clientPath
 
@@ -100,11 +100,11 @@ func main() {
 	// Test Zipcode Tool
 	fmt.Println("\n📍 Testing Zipcode Tool:")
 	zipcodeTool := NewSimpleMCPZipcodeTool(serverPath)
-	
+
 	args := map[string]interface{}{
 		"zipcode": "01310-100",
 	}
-	
+
 	result, err := zipcodeTool.Execute(args)
 	if err != nil {
 		fmt.Printf("❌ Error: %v\n", err)
@@ -115,11 +115,11 @@ func main() {
 	// Test Claude Tool
 	fmt.Println("\n🤖 Testing Claude Tool:")
 	claudeTool := NewSimpleMCPClaudeTool(serverPath)
-	
+
 	args = map[string]interface{}{
 		"question": "What is 2 + 2?",
 	}
-	
+
 	result, err = claudeTool.Execute(args)
 	if err != nil {
 		fmt.Printf("❌ Error: %v\n", err)

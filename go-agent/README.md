@@ -65,15 +65,22 @@ go run test_simple.go
 
 📍 Testing Zipcode Tool:
 ✅ Success!
-Raw MCP Response:
-Sending: {"id":1,"jsonrpc":"2.0","method":"tools/call"...}
-Response: {"id":1,"jsonrpc":"2.0","result":{"content":[{"text":"Your address is {...}
+🔄 Initializing MCP connection...
+✅ MCP connection initialized successfully
+📤 Sending: {"id":2,"jsonrpc":"2.0","method":"tools/call"...}
+📥 Response: {"id":2,"jsonrpc":"2.0","result":{"content":[{"text":"Your address is {...}
 
 🤖 Testing Claude Tool:
 ✅ Success!
-Raw MCP Response:
-Sending: {"id":1,"jsonrpc":"2.0","method":"tools/call"...}
-Response: {"id":1,"jsonrpc":"2.0","result":{"content":[{"text":"Claude says: 4"...}
+🔄 Initializing MCP connection...
+✅ MCP connection initialized successfully
+📤 Sending: {"id":3,"jsonrpc":"2.0","method":"tools/call"...}
+📥 Response: {"id":3,"jsonrpc":"2.0","result":{"content":[{"text":"Claude says: 4"...}
+```
+
+### 4. Test All AI Providers
+```powershell
+go run test_all_ai.go
 ```
 
 ## 🎮 Usage

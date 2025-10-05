@@ -52,7 +52,7 @@ func (t *MCPZipcodeTool) Execute(args map[string]interface{}) (string, error) {
 	}
 
 	// Execute the MCP client
-	clientPath := filepath.Join(t.serverPath, "cmd", "test-client")
+	clientPath := filepath.Join(t.serverPath, "cmd", "mcp-test-client")
 	cmd := exec.Command("go", "run", "main.go", "zipcode", zipcode)
 	cmd.Dir = clientPath
 
@@ -125,7 +125,7 @@ func (t *MCPClaudeTool) Execute(args map[string]interface{}) (string, error) {
 	}
 
 	// Execute the MCP client
-	clientPath := filepath.Join(t.serverPath, "cmd", "test-client")
+	clientPath := filepath.Join(t.serverPath, "cmd", "mcp-test-client")
 	cmd := exec.Command("go", "run", "main.go", "claude", question)
 	cmd.Dir = clientPath
 
@@ -173,7 +173,7 @@ func (t *MCPOpenAITool) Execute(args map[string]interface{}) (string, error) {
 		return "", fmt.Errorf("question argument is required")
 	}
 
-	clientPath := filepath.Join(t.serverPath, "cmd", "test-client")
+	clientPath := filepath.Join(t.serverPath, "cmd", "mcp-test-client")
 	cmd := exec.Command("go", "run", "main.go", "openai", question)
 	cmd.Dir = clientPath
 
@@ -218,7 +218,7 @@ func (t *MCPGeminiTool) Execute(args map[string]interface{}) (string, error) {
 		return "", fmt.Errorf("question argument is required")
 	}
 
-	clientPath := filepath.Join(t.serverPath, "cmd", "test-client")
+	clientPath := filepath.Join(t.serverPath, "cmd", "mcp-test-client")
 	cmd := exec.Command("go", "run", "main.go", "gemini", question)
 	cmd.Dir = clientPath
 
@@ -263,7 +263,7 @@ func (t *MCPMistralTool) Execute(args map[string]interface{}) (string, error) {
 		return "", fmt.Errorf("question argument is required")
 	}
 
-	clientPath := filepath.Join(t.serverPath, "cmd", "test-client")
+	clientPath := filepath.Join(t.serverPath, "cmd", "mcp-test-client")
 	cmd := exec.Command("go", "run", "main.go", "mistral", question)
 	cmd.Dir = clientPath
 
@@ -308,7 +308,7 @@ func (t *MCPHuggingFaceTool) Execute(args map[string]interface{}) (string, error
 		return "", fmt.Errorf("question argument is required")
 	}
 
-	clientPath := filepath.Join(t.serverPath, "cmd", "test-client")
+	clientPath := filepath.Join(t.serverPath, "cmd", "mcp-test-client")
 	cmd := exec.Command("go", "run", "main.go", "huggingface", question)
 	cmd.Dir = clientPath
 
@@ -364,7 +364,7 @@ func (t *AIComparisonTool) Execute(args map[string]interface{}) (string, error) 
 		}
 	}
 
-	clientPath := filepath.Join(t.serverPath, "cmd", "test-client")
+	clientPath := filepath.Join(t.serverPath, "cmd", "mcp-test-client")
 	results := make(map[string]string)
 
 	// Query each provider

@@ -159,7 +159,7 @@ func TestCacheOperations(t *testing.T) {
 
 	// Test cache expiration
 	time.Sleep((cacheTime + 100) * time.Millisecond)
-	
+
 	_, err = cache.Get(key)
 	if err == nil {
 		t.Error("Expected cache to be expired, but got value")
@@ -171,7 +171,7 @@ func TestMCPToolCreation(t *testing.T) {
 	// Test weather tool creation
 	weatherTool := mcp_golang.NewTool("get_weather")
 	weatherTool.Description = "Get weather information for a zip code"
-	
+
 	if weatherTool.Name != "get_weather" {
 		t.Errorf("Expected tool name to be 'get_weather', got '%s'", weatherTool.Name)
 	}
@@ -179,7 +179,7 @@ func TestMCPToolCreation(t *testing.T) {
 	// Test Claude tool creation
 	claudeTool := mcp_golang.NewTool("ask_claude")
 	claudeTool.Description = "Ask a question to Claude AI"
-	
+
 	if claudeTool.Name != "ask_claude" {
 		t.Errorf("Expected tool name to be 'ask_claude', got '%s'", claudeTool.Name)
 	}

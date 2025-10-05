@@ -8,8 +8,6 @@ A  **Model Context Protocol (MCP) server** that integrates **5 major AI provider
 ⚡ **Go LangChain Agent**: Intelligent orchestration with 10x Python performance  
 📁 **File Operations**: Complete file management with AI analysis  
 🔄 **Multi-Step Workflows**: Complex reasoning across multiple AI providers  
-🏗️ **Extensible Architecture**: Perfect foundation for MCP ecosystem  
-🔒 **Enterprise Ready**: Type-safe, robust, scalable
 
 ## 🤖 Supported AI Providers
 
@@ -32,7 +30,92 @@ This project demonstrates the MCP (Model Context Protocol) implementation with:
 
 ![Architecture Diagram](architecture.png)
 
-## 🚀 Features
+## 🚀 Quick Start
+
+### 1. Complete Test Suite (Recommended)
+Run our test script to verify setup and see exactly what works:
+
+**Windows (PowerShell):**
+```powershell
+powershell -ExecutionPolicy Bypass -File .\test-simple.ps1
+```
+
+**Linux/macOS:**
+```bash
+chmod +x test-everything.sh
+./test-everything.sh
+```
+
+**What the test shows:**
+- ✅ **Environment Setup**: Project structure and dependencies
+- ⚠️ **API Keys**: Which keys are missing (expected for new setup)
+- ⚠️ **Direct API Calls**: Tests each provider (will show "NOT SET" until you add keys)
+- ⚠️ **MCP Integration**: Tests the MCP server (needs API keys to fully work)
+- ✅ **Go Agent**: LangChain-style orchestration (works without API keys for structure testing)
+
+**Expected output without API keys:**
+```
+❌ CLAUDE_API_KEY: NOT SET
+❌ OPENAI_API_KEY: NOT SET  
+❌ Timeout waiting for response (normal without API keys)
+✅ Go Agent: Functional
+```
+
+### 2. Manual Setup Steps
+
+**Step 1: API Keys**
+Create a `.env` file in the project root:
+```env
+ANTHROPIC_API_KEY=your_claude_key_here
+OPENAI_API_KEY=your_openai_key_here
+GEMINI_API_KEY=your_gemini_key_here
+MISTRAL_API_KEY=your_mistral_key_here
+HUGGINGFACE_API_KEY=your_huggingface_key_here
+```
+
+**Step 2: Verify Setup**
+```bash
+# Verify API keys
+cd cmd/verify-env
+go run main.go
+
+# Test direct API calls
+cd ../direct-api-test
+go run main.go
+```
+
+**Step 3: Use the MCP Server (WORKING METHOD)**
+```bash
+# Terminal 1: Start the server
+go run main.go
+
+# Terminal 2: Use the client
+cd cmd/test-client
+go run main.go claude "What is the meaning of life?"
+go run main.go zipcode "01310-100"
+```
+
+**With API keys, you'll see:**
+```
+ Sending: {"id":1,"jsonrpc":"2.0","method":"tools/call"...}
+📥 Response: {"jsonrpc":"2.0","id":1,"result":{"content":[{"text":"Claude says: The meaning of life is a profound philosophical question...","type":"text"}],"isError":false}}
+```
+
+**Without API keys, you'll see:**
+```
+� Sending: {"id":1,"jsonrpc":"2.0","method":"tools/call"...}
+📥 Response: {"jsonrpc":"2.0","id":1,"error":{"code":-32000,"message":"ANTHROPIC_API_KEY not found"}}
+```
+
+This shows the system is working - it just needs your API keys to connect to the AI providers.
+
+## � Complete Documentation
+
+- **[COMPLETE-GUIDE.md](COMPLETE-GUIDE.md)** - 🎯 **Comprehensive user guide with troubleshooting**
+- **[go-agent/README.md](go-agent/README.md)** - 🧠 Go LangChain agent documentation  
+- **[mcp-file-ops/README.md](mcp-file-ops/README.md)** - 📁 File operations server guide
+
+## �🚀 Features
 
 ### 1. Zipcode Tool 📮
 - Look up Brazilian addresses by postal code (CEP)
@@ -87,101 +170,87 @@ All AI tools support natural language queries and return formatted responses.
 
 ## 🎯 Usage
 
-### Important: Two Different Programs!
+### Important: How the MCP System Works
 
-This project has **two separate executables**:
+This project has **two main approaches** for testing:
 
-1. **Main MCP Server** (`main.go` in root) - Listens for JSON-RPC requests
-2. **Test Client** (`cmd/test-client/main.go`) - Sends commands to the server
+1. **Manual Two-Process Setup** (`cmd/test-client/`) - **WORKING** ✅
+   - Start server manually in one terminal
+   - Run client in another terminal  
+   - Requires two terminals but actually works
 
-⚠️ **Don't run commands directly on the main server!** Use the test client instead.
+2. **Integrated Test Client** (`cmd/mcp-test-client/`) - **BROKEN** ❌
+   - Supposed to auto-start server
+   - Has timeout issues and initialization problems
+   - Currently not working reliably
 
-### Running the MCP Server
+⚠️ **Use the manual setup with `cmd/test-client/` for reliable testing**
 
-Start the server from the project root:
+### Quick Start (WORKING METHOD)
 
+The **actual working way** to test the MCP server:
+
+**Step 1: Start the server (Terminal 1)**
 ```powershell
+# From project root
 go run .\main.go
 ```
 
-The server will start and listen for JSON-RPC requests via stdin/stdout.
-**This will wait for input - it doesn't accept command-line arguments!**
-
-### Using the Test Client
-
-The test client provides an easy way to interact with the server:
-
+**Step 2: Use the client (Terminal 2)**
 ```powershell
 cd cmd\test-client
+
+# Test the tools
+go run .\main.go list
+go run .\main.go zipcode 01310-100
+go run .\main.go claude "What is the capital of Brazil?"
 ```
 
-#### List Available Tools
+**Working Example Output:**
+```
+PS> go run .\main.go zipcode 01310-100
+📤 Sending: {"id":1,"jsonrpc":"2.0","method":"tools/call"...}
+📥 Response: {"jsonrpc":"2.0","id":1,"result":{"content":[{"text":"Address: Avenida Paulista, Bela Vista, São Paulo, SP","type":"text"}],"isError":false}}
+```
+
+⚠️ **Note**: The integrated client (`cmd/mcp-test-client`) has timeout issues and should be avoided.
+
+### Advanced: Manual Server/Client Setup (WORKING)
+
+This is the **reliable method** that actually works:
+
+**Terminal 1 (Server):**
 ```powershell
+# Start the MCP server
+go run .\main.go
+```
+
+**Terminal 2 (Client):**
+```powershell
+cd cmd\test-client
+
+# Now test the tools - server must be running in Terminal 1
+go run .\main.go claude "What is the capital of Brazil?"
+go run .\main.go zipcode 01310-100
 go run .\main.go list
 ```
 
-**Example Output:**
-```json
-{
-  "tools": [
-    {"name": "zipcode", "description": "Find an address by zip code"},
-    {"name": "ask_claude", "description": "Ask a question to Claude AI"},
-    {"name": "ask_openai", "description": "Ask a question to OpenAI GPT"},
-    {"name": "ask_gemini", "description": "Ask a question to Google Gemini"},
-    {"name": "ask_mistral", "description": "Ask a question to Mistral AI"},
-    {"name": "ask_huggingface", "description": "Ask a question to Hugging Face models"}
-  ]
-}
-```
+**This approach works reliably** because the server runs independently.
 
-#### Test All AI Providers
+### Docker Usage
+
 ```powershell
-# Test Claude AI
-go run .\main.go claude "What is the capital of Brazil?"
+# Build and start all services
+docker-compose up -d
 
-# Test OpenAI GPT
-go run .\main.go openai "Explain quantum physics in simple terms"
+# Check status
+docker-compose ps
 
-# Test Google Gemini
-go run .\main.go gemini "What are the benefits of renewable energy?"
+# View logs
+docker-compose logs -f
 
-# Test Mistral AI
-go run .\main.go mistral "Write a haiku about programming"
-
-# Test Hugging Face
-go run .\main.go huggingface "Hello, how are you?"
-```
-
-#### Test Zipcode Tool
-```powershell
-# Make sure you're in the test-client directory first!
-cd cmd\test-client
-go run .\main.go zipcode 01310-100
-```
-
-**Example Output:**
-```
-Sending: {"id":1,"jsonrpc":"2.0","method":"tools/call","params":{"arguments":{"zip_code":"01310-100"},"name":"zipcode"}}
-Response: {"jsonrpc":"2.0","id":1,"result":{"content":[{"type":"text","text":"Your address is {\"cep\":\"01310-100\",\"logradouro\":\"Avenida Paulista\",\"complemento\":\"\",\"bairro\":\"Bela Vista\",\"localidade\":\"São Paulo\",\"uf\":\"SP\",\"unidade\":\"\",\"ibge\":\"3550308\",\"gia\":\"1004\"}!"}]}}
-```
-
-#### Test Claude AI Tool
-```powershell
-# Make sure you're in the test-client directory first!
-cd cmd\test-client
-go run .\main.go claude "What is the capital of Brazil?"
-```
-
-**Example Outputs:**
-```
-# Claude Response
-Response: {"result":{"content":[{"text":"Claude says: The capital of Brazil is Brasília."}]}}
-
-# OpenAI Response  
-Response: {"result":{"content":[{"text":"OpenAI says: 1+1 equals 2."}]}}
-
-# Mistral Response
-Response: {"result":{"content":[{"text":"Mistral says: Hello! I'm an AI assistant, how can I help you today?"}]}}
+# Stop services
+docker-compose down
 ```
 
 ## 🧠 Go LangChain Agent
@@ -257,14 +326,44 @@ You can also interact with the server directly using JSON-RPC messages:
 mcp-server-test/
 ├── main.go                     # Main MCP server
 ├── go.mod                      # Main project dependencies
-├── .env                        # Environment variables
+├── .env                        # Environment variables (API keys)
 ├── cmd/
-│   └── test-client/
-│       ├── main.go            # Test client utility
-│       └── go.mod             # Test client dependencies
-├── mcp-server-architecture.dot # Graphviz diagram source
-├── architecture.png           # Generated architecture diagram
+│   ├── mcp-test-client/        # ❌ BROKEN integrated client (has timeouts)
+│   │   └── main.go            # Broken - do not use
+│   ├── test-client/            # ✅ WORKING test client (use this!)
+│   │   ├── main.go            # Working client - requires manual server
+│   │   └── go.mod             # Test client dependencies
+│   ├── direct-api-test/        # Direct API testing without MCP
+│   ├── verify-env/             # Environment variable verification
+│   └── orchestrator-test/      # Multi-server testing
+├── go-agent/                   # Go LangChain-style agent
+│   ├── main.go                # Agent orchestration
+│   ├── test_simple.go         # Simple tool testing
+│   └── README.md              # Agent documentation
+├── mcp-file-ops/              # File operations MCP server
+│   ├── main.go                # File operations server
+│   └── Dockerfile             # Docker configuration
+├── docker-compose.yml         # Docker orchestration
+├── Dockerfile                 # Main server Docker config
 └── README.md                  # This file
+```
+
+## 🎯 **Quick Start Guide**
+
+**For immediate testing (WORKING method):**
+```powershell
+# Terminal 1: Start server
+go run .\main.go
+
+# Terminal 2: Use client  
+cd cmd\test-client
+go run .\main.go zipcode 01310-100
+```
+
+**For broken integrated client (avoid):**
+```powershell
+cd cmd\mcp-test-client
+go run .\main.go claude "Hello!"  # This will timeout
 ```
 
 ## 🛠️ Building
@@ -343,18 +442,40 @@ dot -Tpng mcp-server-architecture.dot -o architecture.png
 
 ## 🧪 Testing
 
+### Quick Testing (WORKING Method)
+Use the manual server/client setup for reliable testing:
+
+```powershell
+# Terminal 1: Start server
+go run .\main.go
+
+# Terminal 2: Test with client
+cd cmd\test-client
+go run .\main.go claude "Hello from Claude!"
+go run .\main.go openai "Hello from OpenAI!"
+go run .\main.go gemini "Hello from Gemini!"
+go run .\main.go mistral "Hello from Mistral!"
+go run .\main.go huggingface "Hello from Hugging Face!"
+
+# Test other functionality
+go run .\main.go zipcode 01310-100
+go run .\main.go list
+```
+
 ### Unit Tests
 ```powershell
 go test .\...
 ```
 
 ### Integration Testing
-Use the test client to verify both tools work correctly:
+For manual server/client testing:
 
 ```powershell
-cd cmd\test-client
+# Terminal 1: Start server
+go run .\main.go
 
-# Test all functionality
+# Terminal 2: Test with client
+cd cmd\test-client
 go run .\main.go list
 go run .\main.go zipcode 01310-100
 go run .\main.go claude "Hello, how are you?"

@@ -258,6 +258,9 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	// Keep the server running
+	select {}
 }
 
 func getCep(id string) (string, error) {
