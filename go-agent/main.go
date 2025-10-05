@@ -401,6 +401,195 @@ func (t *AIComparisonTool) Execute(args map[string]interface{}) (string, error) 
 	return comparison, nil
 }
 
+// MCPFileReadTool wraps the MCP file operations server read functionality
+type MCPFileReadTool struct {
+	serverPath string
+}
+
+func NewMCPFileReadTool(serverPath string) *MCPFileReadTool {
+	return &MCPFileReadTool{serverPath: serverPath}
+}
+
+func (t *MCPFileReadTool) Name() string {
+	return "mcp_file_read"
+}
+
+func (t *MCPFileReadTool) Description() string {
+	return `Read contents of a file through the MCP file operations server.
+	Input should be a map with "file_path" key containing the path to the file to read.
+	Returns the complete file contents as text.`
+}
+
+func (t *MCPFileReadTool) Execute(args map[string]interface{}) (string, error) {
+	filePath, ok := args["file_path"].(string)
+	if !ok {
+		return "", fmt.Errorf("file_path argument is required")
+	}
+
+	// Start file operations server and test with it
+	// For now, use a simple implementation that starts the server briefly
+	fileOpsPath := filepath.Join(t.serverPath, "mcp-file-ops")
+
+	// Create JSON-RPC request for file read
+	request := map[string]interface{}{
+		"jsonrpc": "2.0",
+		"id":      1,
+		"method":  "tools/call",
+		"params": map[string]interface{}{
+			"name": "read_file",
+			"arguments": map[string]interface{}{
+				"file_path": filePath,
+			},
+		},
+	}
+
+	requestJSON, _ := json.Marshal(request)
+
+	// Execute via the file ops server (simplified approach)
+	cmd := exec.Command("go", "run", "main.go")
+	cmd.Dir = fileOpsPath
+	cmd.Stdin = strings.NewReader(string(requestJSON))
+
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return "", fmt.Errorf("error reading file via MCP: %v, output: %s", err, string(output))
+	}
+
+	// Parse response
+	result := gjson.Get(string(output), "result.content.0.text")
+	if result.Exists() {
+		return fmt.Sprintf("📄 File contents of %s:\n\n%s", filePath, result.String()), nil
+	}
+
+	return fmt.Sprintf("Could not read file: %s", string(output)), nil
+}
+
+// MCPFileWriteTool wraps the MCP file operations server write functionality
+type MCPFileWriteTool struct {
+	serverPath string
+}
+
+func NewMCPFileWriteTool(serverPath string) *MCPFileWriteTool {
+	return &MCPFileWriteTool{serverPath: serverPath}
+}
+
+func (t *MCPFileWriteTool) Name() string {
+	return "mcp_file_write"
+}
+
+func (t *MCPFileWriteTool) Description() string {
+	return `Write content to a file through the MCP file operations server.
+	Input should be a map with "file_path" and "content" keys.
+	Creates or overwrites the file with the specified content.`
+}
+
+func (t *MCPFileWriteTool) Execute(args map[string]interface{}) (string, error) {
+	filePath, ok := args["file_path"].(string)
+	if !ok {
+		return "", fmt.Errorf("file_path argument is required")
+	}
+
+	content, ok := args["content"].(string)
+	if !ok {
+		return "", fmt.Errorf("content argument is required")
+	}
+
+	fileOpsPath := filepath.Join(t.serverPath, "mcp-file-ops")
+
+	// Create JSON-RPC request for file write
+	request := map[string]interface{}{
+		"jsonrpc": "2.0",
+		"id":      1,
+		"method":  "tools/call",
+		"params": map[string]interface{}{
+			"name": "write_file",
+			"arguments": map[string]interface{}{
+				"file_path": filePath,
+				"content":   content,
+			},
+		},
+	}
+
+	requestJSON, _ := json.Marshal(request)
+
+	cmd := exec.Command("go", "run", "main.go")
+	cmd.Dir = fileOpsPath
+	cmd.Stdin = strings.NewReader(string(requestJSON))
+
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return "", fmt.Errorf("error writing file via MCP: %v, output: %s", err, string(output))
+	}
+
+	// Parse response
+	result := gjson.Get(string(output), "result.content.0.text")
+	if result.Exists() {
+		return fmt.Sprintf("✅ %s", result.String()), nil
+	}
+
+	return fmt.Sprintf("Could not write file: %s", string(output)), nil
+}
+
+// MCPFileListTool wraps the MCP file operations server list functionality
+type MCPFileListTool struct {
+	serverPath string
+}
+
+func NewMCPFileListTool(serverPath string) *MCPFileListTool {
+	return &MCPFileListTool{serverPath: serverPath}
+}
+
+func (t *MCPFileListTool) Name() string {
+	return "mcp_file_list"
+}
+
+func (t *MCPFileListTool) Description() string {
+	return `List files and directories through the MCP file operations server.
+	Input should be a map with "directory" key containing the path to list.
+	Returns a list of files and folders in the specified directory.`
+}
+
+func (t *MCPFileListTool) Execute(args map[string]interface{}) (string, error) {
+	directory, ok := args["directory"].(string)
+	if !ok {
+		return "", fmt.Errorf("directory argument is required")
+	}
+
+	fileOpsPath := filepath.Join(t.serverPath, "mcp-file-ops")
+
+	// Create JSON-RPC request for file list
+	request := map[string]interface{}{
+		"jsonrpc": "2.0",
+		"id":      1,
+		"method":  "tools/call",
+		"params": map[string]interface{}{
+			"name": "list_files",
+			"arguments": map[string]interface{}{
+				"directory": directory,
+			},
+		},
+	}
+
+	requestJSON, _ := json.Marshal(request)
+
+	cmd := exec.Command("go", "run", "main.go")
+	cmd.Dir = fileOpsPath
+	cmd.Stdin = strings.NewReader(string(requestJSON))
+
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return "", fmt.Errorf("error listing files via MCP: %v, output: %s", err, string(output))
+	}
+
+	// Parse response
+	result := gjson.Get(string(output), "result.content.0.text")
+	if result.Exists() {
+		return fmt.Sprintf("📁 Contents of %s:\n\n%s", directory, result.String()), nil
+	}
+
+	return fmt.Sprintf("Could not list directory: %s", string(output)), nil
+}
+
 // ConversationMemory stores conversation history
 type ConversationMemory struct {
 	messages []openai.ChatCompletionMessage
@@ -452,12 +641,16 @@ Available tools:
 - mcp_mistral_ai: Ask questions to Mistral AI. Use {"question": "your question"} format.
 - mcp_huggingface_ai: Ask questions to Hugging Face models. Use {"question": "your question"} format.
 - ai_comparison: Compare responses from multiple AI providers. Use {"question": "your question", "providers": ["claude", "openai", "gemini"]} format.
+- mcp_file_read: Read file contents. Use {"file_path": "/path/to/file.txt"} format.
+- mcp_file_write: Write content to file. Use {"file_path": "/path/to/file.txt", "content": "your content"} format.
+- mcp_file_list: List directory contents. Use {"directory": "/path/to/directory"} format.
 
 Capabilities:
 1. Single AI queries for specific use cases
 2. Multi-AI comparisons for diverse perspectives  
 3. Address lookup with AI context analysis
-4. Multi-step workflows combining tools
+4. File operations (read, write, list) through MCP server
+5. Multi-step workflows combining AI and file operations
 5. Intelligent provider selection based on query type
 
 Tool usage format:
@@ -476,6 +669,11 @@ Always provide clear, formatted responses and explain your reasoning when using 
 	agent.RegisterTool(NewMCPMistralTool(serverPath))
 	agent.RegisterTool(NewMCPHuggingFaceTool(serverPath))
 	agent.RegisterTool(NewAIComparisonTool(serverPath))
+
+	// Register file operation tools
+	agent.RegisterTool(NewMCPFileReadTool(serverPath))
+	agent.RegisterTool(NewMCPFileWriteTool(serverPath))
+	agent.RegisterTool(NewMCPFileListTool(serverPath))
 
 	return agent
 }
